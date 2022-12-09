@@ -6,8 +6,11 @@ object Main2 {
     val gui = new GUI(tree)
     System.out.println("------ Добавить ------")
     tree.insertElement(userType.create(), userType.getTypeComparator())
+    
     tree.insertElement(userType.create(), userType.getTypeComparator())
+    
     tree.insertElement(userType.create(), userType.getTypeComparator())
+    
     tree.insertElement(userType.create(), userType.getTypeComparator())
     tree.printTree()
   }
