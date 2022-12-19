@@ -2,6 +2,7 @@ import java.util.Stack;
 import java.util.Iterator;
 import java.io.*;
 
+
 class Tree implements ITree {
 
     public class Element {
@@ -16,10 +17,6 @@ class Tree implements ITree {
             leftChild = null;
             rightChild = null;
             parent = null;
-        }
-
-        public void printElement() { // Вывод значения узла в консоль
-            System.out.println(" Выбранный узел имеет значение :" + value);
         }
 
         public Element getParent() {
@@ -90,6 +87,8 @@ class Tree implements ITree {
     }
 
     private int size = 0;
+
+    @Override
     public int getSize() {
         return size;
     }
@@ -165,7 +164,7 @@ class Tree implements ITree {
     // поиск по логическому номеру
     public Element findElementByInd(int index) {
         int index_element;
-        Element search_element = this.root, answer;
+        Element search_element = this.root,  answer;
 
         if (search_element.getLeftChild() != null)
             index_element = search_element.getLeftChild().getWeight();
@@ -174,7 +173,6 @@ class Tree implements ITree {
 
         while (true) {
             if (index == index_element) {
-                //answer = search_element.getValue();
                 answer = search_element;
                 break;
             } else if (index > index_element) {
@@ -198,8 +196,16 @@ class Tree implements ITree {
     }
 
 
+    public Object findValueByInd(int index) {
+        Element search_element = this.findElementByInd(index);
+        if(search_element == null) {
+            return null;
+        } else {
+            return search_element.getValue();
+        }
+    }
 
-    boolean deleteElement(Element search_element) {
+    public boolean deleteElement(Element search_element) {
         Element prev_element = search_element.getParent();
 
         if (search_element.getLeftChild() == null && search_element.getRightChild() == null) //удаляемый узел - лист
@@ -409,7 +415,58 @@ class Tree implements ITree {
             }
         }
     }
+    private void createVine()
+    {
+        Element grandParent = null;
+        Element parent = root;
+        Element leftChild;
 
+        while (null != parent)
+        {
+            leftChild = parent.getLeftChild();
+            if (null != leftChild)
+            {
+                grandParent = rotateRight(grandParent, parent, leftChild);
+                parent = leftChild;
+            } else
+            {
+                grandParent = parent;
+                parent = parent.getRightChild();
+            }
+        }
+    }
+
+
+    public Tree Balance()
+    {
+        this.createVine();
+        int n = 0;
+        for (Element tmp = root; null != tmp; tmp = tmp.getRightChild())
+        {
+            n++;
+        }
+        int m = greatestPowerOf2LessThanN(n + 1) - 1;
+        makeRotations(n - m);
+
+        while (m > 1)
+        {
+            makeRotations(m /= 2);
+        }
+
+        weightPlacement(root);
+        return null;
+    }
+
+    private int greatestPowerOf2LessThanN(int n)
+    {
+        int ndx = 0;
+        while (1 < n)
+        {
+            n = (n >> 1);
+            ndx++;
+        }
+        return (1 << ndx);//2^x
+    }
     public String[] getStringTree() {
         String[] list = new String[size];
         System.out.print(getSize());
