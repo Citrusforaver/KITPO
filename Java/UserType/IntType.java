@@ -17,7 +17,7 @@ public class IntType implements UserType{
 
     @Override
     public Object create() {
-        value = getRandomNumber(0, 100);
+        value = getRandomNumber(1223, 100000000);
         return value;
     }
 
