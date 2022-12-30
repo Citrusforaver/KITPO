@@ -193,21 +193,24 @@ public class TestIntType {
             Assert.assertTrue(first <= second);
         }
     };
-    // Проверка скорости балансировки на разных значениях с шагом в тысячу
-    @Test
+   // Проверка скорости удаления на разных значениях с шагом в 10к
+      @Test
     public void testBalanced() {
-        System.out.println("BALANCED TEST");
         Tree tree = new Tree();
-        for(int i = 1000; i <= 10000; i = i + 1000) {
-            for(int j = 0; j < i; j++) {
-                tree.insertElement(i, userType.getTypeComparator());
-            }
 
-            long startTime = System.nanoTime();
+        for (int i = 10000; i <= 310000; i = i + 10000 ) {
+           tree.clear();
+            for(int j = 0; j < i; j++) {
+                tree.insertElement(userType.create(), userType.getTypeComparator());
+
+            }
             tree.Balance();
+            long startTime = System.nanoTime();
+            tree.deleteElemByInd(tree.getSize()-1);
             long endTime = System.nanoTime();
             double timeElapsed = (endTime - startTime) * 1.0 / 1_000_000;
-            System.out.println("N = " + i +  ". Time = " + timeElapsed + " ms.");
+             System.out.println("N = " + i +  ". Time = " + timeElapsed + " ms.");
+
             tree.clear();
         }
 
