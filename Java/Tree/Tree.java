@@ -39,7 +39,7 @@ class Tree implements ITree {
             try {
                 int weight = this.weight;
                 return weight;
-            } catch (NullPointerException e) {
+                    } catch (NullPointerException e) {
                 return 0;
             }
         }
@@ -70,7 +70,18 @@ class Tree implements ITree {
                     "Значение=" + value +
                     '}';
         }
+
+        int F(int level){
+            int s = level;
+            if (leftChild!=null)
+                s+=leftChild.F(level+1);
+            if (rightChild!=null)
+                s+= rightChild.F(level+1);
+            return s;
+        }
+
     }
+
 
     private Element root; // корневой узел
 
@@ -144,10 +155,10 @@ class Tree implements ITree {
 
     }
 
-    private void weightPlacement(Element element) {
+    public void weightPlacement(Element element) {
         if (element != null) {
-            weightPlacement(element.getLeftChild());
-            weightPlacement(element.getRightChild());
+              weightPlacement(element.getLeftChild());
+              weightPlacement(element.getRightChild());
             if (element.getLeftChild() == null || element.getRightChild() == null) {
                 if (element.getLeftChild() == null && element.getRightChild() == null) {
                     element.setWeight(1);
@@ -338,6 +349,44 @@ class Tree implements ITree {
         System.out.println(separator);// подводим черту
     }
 
+
+    public void printTreelevel() {
+        int num=0;
+        Stack globalStack = new Stack(); // общий стек для значений дерева
+        globalStack.push(root);
+        int gaps = 32;
+        boolean isRowEmpty = false;
+        String separator = "-----------------------------------------------------------------";
+        System.out.println(separator);
+        while (isRowEmpty == false) {
+            Stack localStack = new Stack();
+            isRowEmpty = true;
+            for (int j = 0; j < gaps; j++)
+                System.out.print(' ');
+            while (globalStack.isEmpty() == false) { // покуда в общем стеке есть элементы
+                Element temp = (Element) globalStack.pop(); // берем следующий, при этом удаляя его из стека
+
+                if (temp != null) {
+                    localStack.push(temp.getLeftChild()); // соохраняем в локальный стек, наследники текущего элемента
+                    localStack.push(temp.getRightChild());
+                    if (temp.getLeftChild() != null || temp.getRightChild() != null)
+                        isRowEmpty = false;
+
+                } else {
+                    localStack.push(null);
+                    localStack.push(null);
+                }
+                for (int j = 0; j < gaps * 2 - 2; j++)
+                    System.out.print(' ');
+            }
+            num++;
+            gaps /= 2;// при переходе на следующий уровень расстояние между элементами каждый раз уменьшается
+            while (localStack.isEmpty() == false)
+                globalStack.push(localStack.pop()); // перемещаем все элементы из локального стека в глобальный
+        }
+        System.out.println(separator);// подводим черту
+        System.out.println("level: "+num);
+    }
     public void forEach(Action a) throws IOException {
         if (this.root.getWeight() > 0) {
             int counter = 0;
