@@ -112,7 +112,7 @@ public class TestIntType {
         for(int i = size; i > 0; i--) {
             tree.insertElement(i, userType.getTypeComparator());
         }
-        tree.Balance();
+           tree.Balance();
         for(int i = 0; i < size - 3; i++) {
             int first = (int) tree.findValueByInd( i+1);
             int second = (int) tree.findValueByInd( i+2);
@@ -193,28 +193,71 @@ public class TestIntType {
             Assert.assertTrue(first <= second);
         }
     };
-   // Проверка скорости удаления на разных значениях с шагом в 10к
+    // Проверка скорости удаления на разных значениях с шагом в 10к
       @Test
-    public void testBalanced() {
+      public void testBalanced() {
+          Tree tree = new Tree();
+
+          for (int i = 1000; i <= 340000; i = i*2 ) {
+              tree.clear();
+              long startTime = System.nanoTime();
+              for(int j = 0; j < i; j++) {
+                  tree.insertElement(userType.create(), userType.getTypeComparator());
+                  tree.Balance();
+              }
+
+              long endTime = System.nanoTime();
+
+              double timeElapsed = (endTime - startTime) * 1.0 / 1_000_000;
+              System.out.println("N = " + i +  ". Time = " + timeElapsed + " ms.");
+              tree.printTreelevel();
+              tree.clear();
+          }
+
+      }
+
+    @Test
+    public void testBalanced2() {
         Tree tree = new Tree();
 
-        for (int i = 10000; i <= 310000; i = i + 10000 ) {
-           tree.clear();
+        for (int i = 1000; i <= 340000; i = i*2 ) {
+            tree.clear();
+            long startTime = System.nanoTime();
             for(int j = 0; j < i; j++) {
                 tree.insertElement(userType.create(), userType.getTypeComparator());
-
             }
             tree.Balance();
-            long startTime = System.nanoTime();
-            tree.deleteElemByInd(tree.getSize()-1);
             long endTime = System.nanoTime();
-            double timeElapsed = (endTime - startTime) * 1.0 / 1_000_000;
-             System.out.println("N = " + i +  ". Time = " + timeElapsed + " ms.");
 
+            double timeElapsed = (endTime - startTime) * 1.0 / 1_000_000;
+            System.out.println("N = " + i +  ". Time = " + timeElapsed + " ms.");
+            tree.printTreelevel();
             tree.clear();
         }
 
     }
+
+    @Test
+    public void testBalanced3() {
+        Tree tree = new Tree();
+
+        for (int i = 1000; i <= 340000; i = i*2 ) {
+            tree.clear();
+            for(int j = 0; j < i; j++) {
+                tree.insertElement(userType.create(), userType.getTypeComparator());
+            }
+            long startTime = System.nanoTime();
+            tree.Balance();
+            long endTime = System.nanoTime();
+
+            double timeElapsed = (endTime - startTime) * 1.0 / 1_000_000;
+            System.out.println("N = " + i +  ". Time = " + timeElapsed + " ms.");
+            tree.printTreelevel();
+            tree.clear();
+        }
+
+    }
+
 
 
 }
