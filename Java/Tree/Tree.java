@@ -5,6 +5,8 @@ import java.io.*;
 
 class Tree implements ITree {
 
+
+
     public class Element {
 
         private Object value; // ключ узла
@@ -71,17 +73,21 @@ class Tree implements ITree {
                     '}';
         }
 
-        int F(int level){
-            int s = level;
-            if (leftChild!=null)
-                s+=leftChild.F(level+1);
-            if (rightChild!=null)
-                s+= rightChild.F(level+1);
-            return s;
-        }
-
     }
 
+
+    public int sumLnt(){
+        int level = 0;
+        Element current = null;
+        int s = level;
+        if (current.leftChild!=null)
+            s+=level+1;
+        if (current.rightChild!=null)
+            s+= level+1;
+        return s;
+    }
+
+    public int maxLength = 0;
 
     private Element root; // корневой узел
 
@@ -107,14 +113,15 @@ class Tree implements ITree {
     @Override
     public void insertElement(Object value, Comparator comparator) // метод вставки нового элемента
     {
+        int level = 1;
         Element newElement = new Element(); // создание нового узла
         newElement.setValue(value); // вставка данных
         newElement.setWeight(1);
-
         if (root == null) // если корневой узел не существует
         {
             root = newElement;// то новый элемент и есть корневой узел
             size++;
+            maxLength = 1;
 
         } else // корневой узел занят
         {
@@ -123,33 +130,43 @@ class Tree implements ITree {
             while (true) // мы имеем внутренний выход из цикла
             {
                 parentElement = currentElement;
-                if (value == currentElement.getValue()) {   // если такой элемент в дереве уже есть, не сохраняем его
-                    return;    // просто выходим из метода
+                 if (value == currentElement.getValue()) {   // если такой элемент в дереве уже есть, не сохраняем его
+                   return;    // просто выходим из метода
                 } else {
-                    //if (value < currentElement.getValue())  // движение влево?
-                    //if (currentElement.getValue().compareTo(value) > 0)  // движение влево?
-                    if (comparator.compare(currentElement.getValue(), value) > 0) {
-                        currentElement = currentElement.getLeftChild();
-                        if (currentElement == null)// если был достигнут конец цепочки,
-                        {
-                            parentElement.setLeftChild(newElement); //  то вставить слева и выйти из методы
-                            newElement.setParent(parentElement);
-                            weightPlacement(root);
-                            size++;
-                            return;
+
+                        level++;
+                        if (comparator.compare(currentElement.getValue(), value) > 0) {
+                            currentElement = currentElement.getLeftChild();
+                            if (currentElement == null)// если был достигнут конец цепочки,
+                            {
+                                parentElement.setLeftChild(newElement); //  то вставить слева и выйти из методы
+                                newElement.setParent(parentElement);
+                                weightPlacement(root);
+                                size++;
+                                if (level > maxLength) {
+                                    maxLength = level;
+
+                                }
+
+                                return;
+                            }
+                        } else { // Или направо?
+                            level++;
+                            currentElement = currentElement.getRightChild();
+                            if (currentElement == null) // если был достигнут конец цепочки,
+                            {
+                                parentElement.setRightChild(newElement);  //то вставить справа
+                                newElement.setParent(parentElement);
+                                weightPlacement(root);
+                                size++;
+                                if (level > maxLength) {
+                                    maxLength = level;
+                                }
+                                return; // и выйти
+                            }
+
                         }
-                    } else { // Или направо?
-                        currentElement = currentElement.getRightChild();
-                        if (currentElement == null) // если был достигнут конец цепочки,
-                        {
-                            parentElement.setRightChild(newElement);  //то вставить справа
-                            newElement.setParent(parentElement);
-                            weightPlacement(root);
-                            size++;
-                            return; // и выйти
-                        }
-                    }
-                }
+                 }
             }
         }
 
@@ -351,42 +368,47 @@ class Tree implements ITree {
 
 
     public void printTreelevel() {
-        int num=0;
-        Stack globalStack = new Stack(); // общий стек для значений дерева
-        globalStack.push(root);
-        int gaps = 32;
-        boolean isRowEmpty = false;
-        String separator = "-----------------------------------------------------------------";
-        System.out.println(separator);
-        while (isRowEmpty == false) {
-            Stack localStack = new Stack();
-            isRowEmpty = true;
-            for (int j = 0; j < gaps; j++)
-                System.out.print(' ');
-            while (globalStack.isEmpty() == false) { // покуда в общем стеке есть элементы
-                Element temp = (Element) globalStack.pop(); // берем следующий, при этом удаляя его из стека
-
-                if (temp != null) {
-                    localStack.push(temp.getLeftChild()); // соохраняем в локальный стек, наследники текущего элемента
-                    localStack.push(temp.getRightChild());
-                    if (temp.getLeftChild() != null || temp.getRightChild() != null)
-                        isRowEmpty = false;
-
-                } else {
-                    localStack.push(null);
-                    localStack.push(null);
-                }
-                for (int j = 0; j < gaps * 2 - 2; j++)
+        // метод для вывода дерева в консоль
+            int num=0;
+            Stack globalStack = new Stack(); // общий стек для значений дерева
+            globalStack.push(root);
+            int gaps = 32; // начальное значение расстояния между элементами
+            boolean isRowEmpty = false;
+            String separator = "-----------------------------------------------------------------";
+            System.out.println(separator);// черта для указания начала нового дерева
+            while (isRowEmpty == false) {
+                Stack localStack = new Stack(); // локальный стек для задания потомков элемента
+                isRowEmpty = true;
+                for (int j = 0; j < gaps; j++)
                     System.out.print(' ');
+                while (globalStack.isEmpty() == false) { // покуда в общем стеке есть элементы
+                    Element temp = (Element) globalStack.pop(); // берем следующий, при этом удаляя его из стека
+
+                    if (temp != null) {
+//System.out.print(temp.getValue()); // выводим его значение в консоли
+//System.out.print(temp.getValue() + ":" + temp.getWeight()); // выводим его значение в консоли
+                        localStack.push(temp.getLeftChild()); // соохраняем в локальный стек, наследники текущего элемента
+                        localStack.push(temp.getRightChild());
+                        if (temp.getLeftChild() != null || temp.getRightChild() != null)
+                            isRowEmpty = false;
+
+                    } else {
+// System.out.print("__");// - если элемент пустой
+                        localStack.push(null);
+                        localStack.push(null);
+                    }
+                    for (int j = 0; j < gaps * 2 - 2; j++)
+                        System.out.print(' ');
+                }
+// System.out.println();
+                num++;
+                gaps /= 2;// при переходе на следующий уровень расстояние между элементами каждый раз уменьшается
+                while (localStack.isEmpty() == false)
+                    globalStack.push(localStack.pop()); // перемещаем все элементы из локального стека в глобальный
             }
-            num++;
-            gaps /= 2;// при переходе на следующий уровень расстояние между элементами каждый раз уменьшается
-            while (localStack.isEmpty() == false)
-                globalStack.push(localStack.pop()); // перемещаем все элементы из локального стека в глобальный
+            System.out.println(separator);// подводим черту
+            System.out.println("level: "+num);
         }
-        System.out.println(separator);// подводим черту
-        System.out.println("level: "+num);
-    }
     public void forEach(Action a) throws IOException {
         if (this.root.getWeight() > 0) {
             int counter = 0;
@@ -492,6 +514,7 @@ class Tree implements ITree {
         int n = 0;
         for (Element tmp = root; null != tmp; tmp = tmp.getRightChild())
         {
+
             n++;
         }
         int m = greatestPowerOf2LessThanN(n + 1) - 1;
@@ -499,9 +522,10 @@ class Tree implements ITree {
 
         while (m > 1)
         {
+            //maxLength--;
             makeRotations(m /= 2);
         }
-
+        maxLength--;
         weightPlacement(root);
         return null;
     }
